@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro Automático NFC</title>
+</head>
+<body onload="enviarDatos()">
+  <h2>Registrando datos...</h2>
+
+  <script>
+    async function enviarDatos() {
+      const ahora = new Date();
+      const fecha = ahora.toISOString().split('T')[0];
+      const hora = ahora.toTimeString().split(' ')[0];
+      const numero = 1;
+
+      if (!navigator.geolocation) {
+        alert("El navegador no soporta GPS.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        const data = {
+          data: {
+            fecha: fecha,
+            hora: hora,
+            numero: numero,
+            latitud: lat,
+            longitud: lon
+          }
+        };
+
+        const endpoint = "https://sheetdb.io/api/v1/6tcn779lclvmb"; // <-- Cambia esto
+
+        try {
+          await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+          });
+          document.body.innerHTML = "<h2>¡Datos registrados correctamente!</h2>";
+        } catch (e) {
+          console.error("Error al enviar", e);
+          document.body.innerHTML = "<h2>Error al registrar datos</h2>";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+
